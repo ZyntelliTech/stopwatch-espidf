@@ -1,20 +1,3 @@
 {
-  "C_Cpp.intelliSenseEngine": "default",
-  "idf.espIdfPathWin": "C:\\Users\\zyntellitech\\esp\\v5.5.2\\esp-idf",
-  "idf.pythonInstallPath": "C:\\Users\\zyntellitech\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
-  "idf.openOcdConfigs": [
-    "board/esp32s3-builtin.cfg"
-  ],
-  "idf.portWin": "COM7",
-  "idf.toolsPathWin": "C:\\Users\\zyntellitech\\.espressif",
-  "idf.customExtraVars": {
-    "IDF_TARGET": "esp32s3"
-  },
-  "clangd.path": "C:\\Users\\zyntellitech\\.espressif\\tools\\esp-clang\\esp-19.1.2_20250312\\esp-clang\\bin\\clangd.exe",
-  "clangd.arguments": [
-    "--background-index",
-    "--query-driver=**",
-    "--compile-commands-dir=d:\\2025\\Stopwatch\\stopwatch-idf\\build"
-  ],
-  "idf.flashType": "UART"
+    "cmake.sourceDirectory": "D:/2026/Stopwatch/stopwatch-espidf/Firmware"
 }
