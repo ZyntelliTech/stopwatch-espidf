@@ -7,6 +7,7 @@ static int64_t start_us = 0;
 static int64_t pause_us = 0;
 static int64_t accumulated_us = 0;
 static bool running = false;
+static uint8_t is_initialized = 1;
 
 /* Lap handling */
 static uint32_t last_lap_time_10ms = 0;
@@ -42,6 +43,7 @@ void stopwatch_start(void)
 
     start_us = esp_timer_get_time();
     running = true;
+    is_initialized = 0;
 }
 
 void stopwatch_stop(void)
@@ -51,6 +53,7 @@ void stopwatch_stop(void)
     pause_us = esp_timer_get_time();
     accumulated_us += (pause_us - start_us);
     running = false;
+    is_initialized = 0;
 }
 
 uint8_t get_stopwatch_state()
@@ -60,13 +63,19 @@ uint8_t get_stopwatch_state()
 
 void stopwatch_reset(void)
 {
-     start_us = 0;
+    start_us = 0;
     pause_us = 0;
     accumulated_us = 0;
     running = false;
 
     lap_count = 0;
     last_lap_time_10ms = 0;
+    is_initialized = 1;
+}
+
+uint8_t stopwatch_is_initialized(void)
+{
+    return is_initialized;
 }
 
 void stopwatch_get_str_10ms(char *buf, size_t len)

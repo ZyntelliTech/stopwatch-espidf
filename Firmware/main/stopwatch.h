@@ -16,6 +16,7 @@ void stopwatch_start(void);
 void stopwatch_stop(void);
 void stopwatch_reset(void);
 uint8_t get_stopwatch_state();
+uint8_t stopwatch_is_initialized(void);
 
 /* formatted string MM:SS.hh */
 void stopwatch_get_str_10ms(char *buf, size_t len);

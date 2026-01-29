@@ -9,7 +9,7 @@
 #include "stopwatch.h"
 #include "driver/gpio.h"
 
-#define DEBOUNCE_MS  30
+#define DEBOUNCE_MS  10
 typedef struct {
     char name[32];
     char type[32];
@@ -17,9 +17,13 @@ typedef struct {
     char watch_number[2];
 } player_t;
 
+player_t player;
+
 typedef enum {
     STOPWATCH_PAGE = 0,
-    SWIMMING_PAGE
+    SWIMMING_PAGE,
+    CONFIRM_PAGE,
+    HEADTIMER_PAGE
 } page_state_t;
 
 static const char *TAG = "main";
@@ -100,16 +104,24 @@ void app_main(void)
             stable_state = state;
 
             //Active Low buttons
-            if (!(state & (1 << 0))) {  // START/STOP
-                if(get_stopwatch_state()) {
-                    stopwatch_stop();
+            if (!(state & (1 << 0))) {  // START/STOP - Right Button
+                if ((page_index != CONFIRM_PAGE)){
+                    if(get_stopwatch_state() == 0) {
+                        stopwatch_start();
+                    } else {
+                        stopwatch_stop();
+                    }
                 } else {
-                    stopwatch_start();
+                    page_index = SWIMMING_PAGE;
+                    strcpy(player.name, "");
+                    strcpy(player.type, "FREESTYLE");  
+                    strcpy(player.lane_count, "4");
+                    strcpy(player.watch_number, "1");     
                 }
             }
-            if (!(state & (1 << 1))) {  // LAP / PAGE SWITCH
+            if (!(state & (1 << 1))) {  // LAP / PAGE SWITCH - Middle Button
                 if (get_stopwatch_state()) {
-                    if (stopwatch_lap()) {
+                    if ((page_index == STOPWATCH_PAGE) && stopwatch_lap()) {
                         lap_entry_t lap;
                         uint8_t idx = stopwatch_get_lap_count() - 1;
                         stopwatch_get_lap(idx, &lap);
@@ -119,15 +131,35 @@ void app_main(void)
                     }
 
                 } else {
-                    page_index = (page_index == STOPWATCH_PAGE) ? SWIMMING_PAGE : STOPWATCH_PAGE;
+                    if (page_index == SWIMMING_PAGE) {
+                        page_index = STOPWATCH_PAGE;
+                    }
+                    else if (page_index == STOPWATCH_PAGE) {
+                        page_index = SWIMMING_PAGE;
+                    }
                 }
             }
-            if (!(state & (1 << 2))) {   // RESET
-                stopwatch_reset();
-                memset(buf, '0', sizeof(buf));
-                memset(lap_buf, '0', sizeof(lap_buf));
-                memset(split_buf, '0', sizeof(split_buf));
-                memset(lap_count_str, '0', sizeof(lap_count_str));
+            if (!(state & (1 << 2))) {   // RESET - Left Button
+                if (stopwatch_is_initialized()){
+                    if (page_index == SWIMMING_PAGE) {
+                        page_index = CONFIRM_PAGE;
+                    } else if (page_index == CONFIRM_PAGE) {
+                        page_index = SWIMMING_PAGE;
+                        strcpy(player.name, "JOHN DOE");
+                        strcpy(player.type, "FREESTYLE");  
+                        strcpy(player.lane_count, "4");
+                        strcpy(player.watch_number, "1");            
+                    }
+                } else {
+                    if ((get_stopwatch_state() == 0)) {
+                        stopwatch_reset();
+                        memset(buf, '0', sizeof(buf));
+                        memset(lap_buf, '0', sizeof(lap_buf));
+                        memset(split_buf, '0', sizeof(split_buf));
+                        memset(lap_count_str, '0', sizeof(lap_count_str));
+                    }
+                }
+                
             }
         }
 
@@ -139,13 +171,13 @@ void app_main(void)
             oled_draw_stopwatch(buf, lap_buf, split_buf, lap_count_str);
             break;
         case SWIMMING_PAGE:
-            player_t player = {
-                .name = "JOHN DOE",
-                .type = "M 50 FREE",
-                .lane_count = "6",
-                .watch_number = "3",
-            };
             oled_draw_swimming_watch(buf, player.name, player.type, player.lane_count, player.watch_number, true);
+            break;
+        case HEADTIMER_PAGE:
+            oled_draw_headtimer_watch(buf, true);
+            break;
+        case CONFIRM_PAGE:
+            oled_draw_confirm_watch();
             break;
         default:
             break;

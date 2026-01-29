@@ -252,6 +252,62 @@ void draw_swimming_watch(u8g2_t *u8g2, const char *sw_str, const char *name_str,
     u8g2_DrawXBM(u8g2, 92, 31, 2, 2, image_chrono_second_point_bits);
 }
 
+void draw_headtimer_page(u8g2_t *u8g2, const char *sw_str)
+{
+    // To be implemented
+    const char chrono_hour[2] = {sw_str[1], '\0'};
+    const char chrono_minute[3] = {sw_str[3], sw_str[4], '\0'};
+    const char chrono_second[3] = {sw_str[6], sw_str[7], '\0'};
+    const char chrono_millisecond[3] = {sw_str[9], sw_str[10], '\0'};
+
+    u8g2_SetFontMode(u8g2, 1);
+
+    u8g2_SetFont(u8g2, u8g2_font_profont29_tr);
+    // chrono_hour
+    u8g2_DrawStr(u8g2, 9, 44, chrono_hour);
+    // chrono_minute
+    u8g2_DrawStr(u8g2, 27, 44, chrono_minute);
+    // chrono_second
+    u8g2_DrawStr(u8g2, 61, 44, chrono_second);
+    // chrono_millisecond
+    u8g2_SetFont(u8g2, u8g2_font_profont22_tr);
+    u8g2_DrawStr(u8g2, 95, 44, chrono_millisecond);
+
+    u8g2_SetFont(u8g2, u8g2_font_profont15_tr);
+    u8g2_DrawStr(u8g2, 5, 11, "HEAD");
+
+    u8g2_DrawXBM(u8g2, 58, 29, 2, 11, image_chrono_minute_colon_bits);
+    // chrono_hour_colon
+    u8g2_DrawXBM(u8g2, 24, 29, 2, 11, image_chrono_minute_colon_bits);
+    // chrono_second_point
+    u8g2_DrawXBM(u8g2, 92, 41, 2, 2, image_chrono_second_point_bits);
+    u8g2_DrawLine(u8g2, 1, 22, 126, 22);
+    u8g2_DrawLine(u8g2, 1, 47, 126, 47);
+    u8g2_DrawLine(u8g2, 1, 22, 1, 47);
+    u8g2_DrawLine(u8g2, 126, 22, 126, 47);
+
+}
+void draw_confirm_page(u8g2_t *u8g2)
+{
+    u8g2_SetBitmapMode(u8g2, 1);
+    u8g2_SetFontMode(u8g2, 1);
+
+    // YES
+    u8g2_SetFont(u8g2, u8g2_font_profont15_tr);
+    u8g2_DrawStr(u8g2, 5, 11, "YES");
+
+    // NO
+    u8g2_DrawStr(u8g2, 109, 12, "NO");
+
+    // player_name
+    u8g2_SetFont(u8g2, u8g2_font_profont17_tr);
+    u8g2_DrawStr(u8g2, 27, 48, "JOHN DOE");
+
+    // Message
+    u8g2_SetFont(u8g2, u8g2_font_profont15_tr);
+    u8g2_DrawStr(u8g2, 8, 28, "Confirm Swimmer:");
+}
+
 void oled_init(void)
 {
     u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
@@ -292,6 +348,20 @@ void oled_draw_swimming_watch(const char *sw_str, const char *name_str, const ch
     u8g2_ClearBuffer(&u8g2);
     draw_streaming_icon(&u8g2, is_streaming);
     draw_swimming_watch(&u8g2, sw_str, name_str, type_str, lane_count_str, watch_number_str);
+    u8g2_SendBuffer(&u8g2);
+}
+
+void oled_draw_headtimer_watch(const char *sw_str, bool is_streaming)
+{
+    u8g2_ClearBuffer(&u8g2);
+    draw_streaming_icon(&u8g2, is_streaming);
+    draw_headtimer_page(&u8g2, sw_str);
+    u8g2_SendBuffer(&u8g2);
+}
+void oled_draw_confirm_watch(void)
+{
+    u8g2_ClearBuffer(&u8g2);
+    draw_confirm_page(&u8g2);
     u8g2_SendBuffer(&u8g2);
 }
 

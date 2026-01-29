@@ -5,6 +5,8 @@
 void oled_init(void);
 void oled_draw_stopwatch(const char *sw_str, const char *lap_str, const char *split_str, const char *lap_count_str);
 void oled_draw_swimming_watch(const char *sw_str, const char *name_str, const char *type_str, const char *lane_count_str, const char *watch_number_str, bool is_streaming);
+void oled_draw_headtimer_watch(const char *sw_str, bool is_streaming);
+void oled_draw_confirm_watch(void);
 
 typedef enum {
     BATTERY_EMPTY = 0,
